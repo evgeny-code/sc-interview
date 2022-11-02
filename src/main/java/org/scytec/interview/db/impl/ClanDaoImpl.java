@@ -9,6 +9,7 @@ import org.scytec.interview.services.DBCH;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public enum ClanDaoImpl implements ClanDao {
@@ -20,7 +21,7 @@ public enum ClanDaoImpl implements ClanDao {
                 .map(clanRecord -> org.scytec.interview.pojo.Clan.builder()
                         .id(clanRecord.getId())
                         .name(clanRecord.getName())
-                        .gold(clanRecord.getGold())
+                        .gold(new AtomicInteger(clanRecord.getGold()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -33,7 +34,7 @@ public enum ClanDaoImpl implements ClanDao {
         return org.scytec.interview.pojo.Clan.builder()
                 .id(clanRecord.getId())
                 .name(clanRecord.getName())
-                .gold(clanRecord.getGold())
+                .gold(new AtomicInteger(clanRecord.getGold()))
                 .build();
     }
 
@@ -42,7 +43,7 @@ public enum ClanDaoImpl implements ClanDao {
         ClanRecord clanRecord = DBCH.INSTANCE.getDslContext().newRecord(Clan.CLAN);
 
         clanRecord.setName(clan.getName());
-        clanRecord.setGold(clan.getGold());
+        clanRecord.setGold(clan.getGold().get());
 
         clanRecord.store();
     }
@@ -52,7 +53,7 @@ public enum ClanDaoImpl implements ClanDao {
     public void update(org.scytec.interview.pojo.Clan clan) {
         DBCH.INSTANCE.getDslContext().update(Clan.CLAN)
                 .set(Clan.CLAN.NAME, clan.getName())
-                .set(Clan.CLAN.GOLD, clan.getGold())
+                .set(Clan.CLAN.GOLD, clan.getGold().get())
                 .where(Clan.CLAN.ID.eq(clan.getId()))
                 .execute();
     }
@@ -63,7 +64,7 @@ public enum ClanDaoImpl implements ClanDao {
         for (org.scytec.interview.pojo.Clan clan : clans) {
             queries.add(DBCH.INSTANCE.getDslContext().update(Clan.CLAN)
                     .set(Clan.CLAN.NAME, clan.getName())
-                    .set(Clan.CLAN.GOLD, clan.getGold())
+                    .set(Clan.CLAN.GOLD, clan.getGold().get())
                     .where(Clan.CLAN.ID.eq(clan.getId())));
         }
 

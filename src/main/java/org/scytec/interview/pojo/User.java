@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,9 +14,9 @@ import lombok.NoArgsConstructor;
 public class User {
     private long id;
     private String name;
-    private int gold;
+    private AtomicInteger gold;
 
-    public void addGold(int amount) {
-        gold += amount;
+    public int addGold(int amount) {
+        return gold.addAndGet(amount);
     }
 }

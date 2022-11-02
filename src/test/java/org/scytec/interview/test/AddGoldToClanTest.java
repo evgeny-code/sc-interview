@@ -20,7 +20,7 @@ public class AddGoldToClanTest {
         User[] users = Util.getUsers();
 
         Clan clan = Util.getRandom(clans);
-        int goldStart = clan.getGold();
+        int goldStart = clan.getGold().get();
         List<User> usersWhoAdd = new ArrayList<>();
 
         List<Thread> threads = new ArrayList<>();
@@ -61,7 +61,7 @@ public class AddGoldToClanTest {
             if (clanNew.getId() == clan.getId()) {
                 System.out.println(clan);
                 System.out.println(clanNew);
-                goldEnd = clanNew.getGold();
+                goldEnd = clanNew.getGold().get();
             }
         }
 

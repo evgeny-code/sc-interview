@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 // Упрощенный объект клана
 @Data
 @Builder
@@ -13,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class Clan {
     private long id;     // id клана
     private String name; // имя клана
-    private int gold;    // текущее количество золота в казне клана
+    private AtomicInteger gold;    // текущее количество золота в казне клана
 
-    public void addGold(int amount) {
-        gold += amount;
+    public int addGold(int amount) {
+        return gold.addAndGet(amount);
     }
 }

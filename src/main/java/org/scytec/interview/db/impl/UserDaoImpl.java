@@ -10,6 +10,7 @@ import org.scytec.interview.services.DBCH;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public enum UserDaoImpl implements UserDao {
@@ -21,7 +22,7 @@ public enum UserDaoImpl implements UserDao {
                 .map(userProfileRecord -> User.builder()
                         .id(userProfileRecord.getId())
                         .name(userProfileRecord.getName())
-                        .gold(userProfileRecord.getGold())
+                        .gold(new AtomicInteger(userProfileRecord.getGold()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -34,7 +35,7 @@ public enum UserDaoImpl implements UserDao {
         return User.builder()
                 .id(userProfileRecord.getId())
                 .name(userProfileRecord.getName())
-                .gold(userProfileRecord.getGold())
+                .gold(new AtomicInteger(userProfileRecord.getGold()))
                 .build();
     }
 
@@ -43,7 +44,7 @@ public enum UserDaoImpl implements UserDao {
         UserProfileRecord userProfileRecord = DBCH.INSTANCE.getDslContext().newRecord(UserProfile.USER_PROFILE);
 
         userProfileRecord.setName(user.getName());
-        userProfileRecord.setGold(user.getGold());
+        userProfileRecord.setGold(user.getGold().get());
 
         userProfileRecord.store();
     }
@@ -53,7 +54,7 @@ public enum UserDaoImpl implements UserDao {
     public void update(User user) {
         DBCH.INSTANCE.getDslContext().update(UserProfile.USER_PROFILE)
                 .set(UserProfile.USER_PROFILE.NAME, user.getName())
-                .set(UserProfile.USER_PROFILE.GOLD, user.getGold())
+                .set(UserProfile.USER_PROFILE.GOLD, user.getGold().get())
                 .where(UserProfile.USER_PROFILE.ID.eq(user.getId()))
                 .execute();
     }
@@ -65,7 +66,7 @@ public enum UserDaoImpl implements UserDao {
             queries.add(DBCH.INSTANCE.getDslContext()
                     .update(UserProfile.USER_PROFILE)
                     .set(UserProfile.USER_PROFILE.NAME, user.getName())
-                    .set(UserProfile.USER_PROFILE.GOLD, user.getGold())
+                    .set(UserProfile.USER_PROFILE.GOLD, user.getGold().get())
                     .where(UserProfile.USER_PROFILE.ID.eq(user.getId())));
         }
 

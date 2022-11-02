@@ -21,25 +21,30 @@ public enum UserAddGoldService {
                 DbFacade.INSTANCE.clanLock.lock(clanId);
 
                 Clan clan = DbFacade.INSTANCE.getClan(clanId);
-                int goldFrom = clan.getGold();
+                while (true) {
+                    int goldFrom = clan.getGold().get();
+                    int userGoldFrom = user.getGold().get();
 
-                if (gold > user.getGold())
-                    throw new IllegalArgumentException("Not enough gold");
+                    if (gold > userGoldFrom)
+                        throw new IllegalArgumentException("Not enough gold");
 
-                clan.addGold(gold);
-                user.addGold(-gold);
+                    if (goldFrom + gold == clan.addGold(gold)
+                            && userGoldFrom - gold == user.addGold(-gold)) {
 
-                DbFacade.INSTANCE.updateTogether(clan, user);
+                        DbFacade.INSTANCE.updateTogether(clan, user);
 
-                DbFacade.INSTANCE.clanHistorySetForSave
-                        .add(ClanHistory.builder()
-                                .action(Action.ADD_GOLD_TO_CLAN.name())
-                                .dateTime(LocalDateTime.now())
-                                .clanId(clanId)
-                                .userId(userId)
-                                .goldFrom(goldFrom)
-                                .goldTo(clan.getGold())
-                                .build());
+                        DbFacade.INSTANCE.clanHistorySetForSave
+                                .add(ClanHistory.builder()
+                                        .action(Action.ADD_GOLD_TO_CLAN.name())
+                                        .dateTime(LocalDateTime.now())
+                                        .clanId(clanId)
+                                        .userId(userId)
+                                        .goldFrom(goldFrom)
+                                        .goldTo(goldFrom + gold)
+                                        .build());
+                        break;
+                    }
+                }
             } finally {
                 DbFacade.INSTANCE.clanLock.unlock(clanId);
             }

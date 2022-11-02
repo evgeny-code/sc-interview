@@ -20,22 +20,25 @@ public enum TaskService {
                 DbFacade.INSTANCE.clanLock.lock(clanId);
 
                 Clan clan = DbFacade.INSTANCE.getClan(clanId);
-                int goldFrom = clan.getGold();
+                int goldFrom = clan.getGold().get();
 
-                clan.addGold(task.getReward());
-                DbFacade.INSTANCE.updateClan(clan);
+                while (true) {
+                    if (goldFrom + task.getReward() == clan.addGold(task.getReward())) {
+                        DbFacade.INSTANCE.updateClan(clan);
 
+                        DbFacade.INSTANCE.clanHistorySetForSave
+                                .add(ClanHistory.builder()
+                                        .action(Action.COMPLETE_TASK.name())
+                                        .dateTime(LocalDateTime.now())
+                                        .clanId(clanId)
+                                        .taskId(taskId)
+                                        .goldFrom(goldFrom)
+                                        .goldTo(goldFrom + task.getReward())
+                                        .build());
 
-                DbFacade.INSTANCE.clanHistorySetForSave
-                        .add(ClanHistory.builder()
-                                .action(Action.COMPLETE_TASK.name())
-                                .dateTime(LocalDateTime.now())
-                                .clanId(clanId)
-                                .taskId(taskId)
-                                .goldFrom(goldFrom)
-                                .goldTo(clan.getGold())
-                                .build());
-
+                        break;
+                    }
+                }
             } finally {
                 DbFacade.INSTANCE.clanLock.unlock(clanId);
             }

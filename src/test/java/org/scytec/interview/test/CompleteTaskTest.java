@@ -25,7 +25,7 @@ public class CompleteTaskTest {
         Task[] tasks = Util.getTasks();
 
         Clan clan = Util.getRandom(clans);
-        int goldStart = clan.getGold();
+        int goldStart = clan.getGold().get();
         List<Task> completedTasks = Collections.synchronizedList(new ArrayList<>());
 
         List<Thread> threads = new ArrayList<>();
@@ -65,7 +65,7 @@ public class CompleteTaskTest {
             if (clanNew.getId() == clan.getId()) {
                 System.out.println(clan);
                 System.out.println(clanNew);
-                goldEnd = clanNew.getGold();
+                goldEnd = clanNew.getGold().get();
             }
         }
 

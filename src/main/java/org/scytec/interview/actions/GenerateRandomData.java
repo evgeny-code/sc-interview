@@ -13,6 +13,7 @@ import org.scytec.interview.pojo.User;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 public class GenerateRandomData implements Callable<Void> {
@@ -26,14 +27,14 @@ public class GenerateRandomData implements Callable<Void> {
         for (int i = 0; i < 10; i++) {
             clanDao.insert(Clan.builder()
                     .name("Clan #" + UUID.randomUUID())
-                    .gold(100 + 10 * i)
+                    .gold(new AtomicInteger(100 + 10 * i))
                     .build());
         }
 
         for (int i = 0; i < 10; i++) {
             userDao.insert(User.builder()
                     .name("User #" + UUID.randomUUID())
-                    .gold(10 + i)
+                    .gold(new AtomicInteger(10 + i))
                     .build());
         }
 
