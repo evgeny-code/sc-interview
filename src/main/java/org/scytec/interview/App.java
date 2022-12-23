@@ -6,23 +6,35 @@ import org.scytec.interview.web.AppHttpHandler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class App {
     public static final ExecutorService ES = Executors.newFixedThreadPool(2 * Runtime.getRuntime().availableProcessors() - 1);
 
     public static void main(String[] args) {
         ES.submit(() -> {
-            while (true) {
+            while (!Thread.interrupted()) {
                 DbFacade.INSTANCE.flushHistory();
-                Thread.sleep(333);
+                try {
+                    Thread.sleep(333);
+                } catch (InterruptedException e) {
+                    Logger.getGlobal().log(Level.WARNING, "Interrupted", e);
+                    Thread.currentThread().interrupt();
+                }
             }
         });
 
         ES.submit(() -> {
-            while (true) {
+            while (!Thread.interrupted()) {
                 DbFacade.INSTANCE.flushClans();
                 DbFacade.INSTANCE.flushUsers();
-                Thread.sleep(123);
+                try {
+                    Thread.sleep(123);
+                } catch (InterruptedException e) {
+                    Logger.getGlobal().log(Level.WARNING, "Interrupted", e);
+                    Thread.currentThread().interrupt();
+                }
             }
         });
 
